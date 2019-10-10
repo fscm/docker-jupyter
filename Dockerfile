@@ -93,7 +93,7 @@ RUN \
   find /build/lib/python${PYTHON_VERSION%.*} /build/share -depth \( \( -type d -a \( -name test -o -name tests -o -name __pycache__ -o -name man \) \) -o \( -type f -a \( -name '*.pyc' -o -name '*.pyo' -o -name '*.bat' \) \) \) -exec rm -rf '{}' + && \
   for p in $(find /build/bin/ -type f); do s=$(basename ${p}); t=$(dirname ${p})/$(echo ${s} | sed "s/-${PYTHON_VERSION%.*}//;s/${PYTHON_VERSION%.*}m//;s/${PYTHON_VERSION%.*}//"); if [ ! -f "${t}" ]; then ln -s "${s}" "${t}"; fi; done && \
   cd - && \
-# system setings
+# system settings
   install --directory --owner=root --group=root --mode=0755 /build/run/systemd && \
   echo 'docker' > /build/run/systemd/container && \
 # libs
