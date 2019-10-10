@@ -1,0 +1,140 @@
+#!/bin/sh
+#
+# Shell script to start the Jupyter Docker image.
+#
+# Copyright 2016-2019, Frederico Martins
+#   Author: Frederico Martins <http://github.com/fscm>
+#
+# SPDX-License-Identifier: MIT
+#
+# This program is free software. You can use it and/or modify it under the
+# terms of the MIT License.
+#
+
+set -e
+
+BASENAME=$(basename "${0}")
+
+
+# Variables
+ACTION_HELP=0
+ACTION_INIT=0
+ACTION_START=0
+
+JUPYTER_ADDRESS="0.0.0.0"
+JUPYTER_PORT="8888"
+JUPYTER_TOKEN=""
+START_NOTEBOOK=1
+
+__JUPYTER_WORDIR__="/work"
+
+
+# Usage
+function show_usage() {
+  echo "Usage: ${BASENAME} [options] (help|init|start)"
+  echo "  help:"
+  echo "    <none>"
+  echo "  init:"
+  echo "    <none>"
+  echo "  start:"
+  echo "    -l  Starts the JypiterLab environment"
+  echo "    -n  Start the Jupyter Notebook environment (default)"
+}
+
+
+# Options parsing
+while getopts ":ln" opt; do
+  case ${opt} in
+    l)
+      START_NOTEBOOK=0
+      ;;
+    n)
+      START_NOTEBOOK=1
+      ;;
+    \?)
+      echo >&2 "  [ERROR] Invalid option: -${OPTARG}"
+      exit 1
+      ;;
+    :)
+      echo >&2 "  [ERROR] Option -${OPTARG} requires an argument"
+      exit 2
+      ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+for command in "${@}"; do
+  case "${command}" in
+    [Hh][Ee][Ll][Pp])
+      ACTION_HELP=1
+      ;;
+    [Ii][Nn][Ii][Tt])
+      ACTION_INIT=1
+      ;;
+    [Ss][Tt][Aa][Rr][Tt])
+      ACTION_START=1
+      ;;
+    *)
+      echo >&2 "  [WARN] Unknown command '${command}'"
+      ;;
+  esac
+done
+
+
+# Check arguments
+if [[ $# -eq 0 ]]; then
+  show_usage
+  exit 3
+fi
+if [[ "$((ACTION_HELP+ACTION_INIT+ACTION_START))" -eq 0 ]]; then
+  show_usage
+  exit 0
+fi
+
+
+# Check permissions
+if [[ "$(id -u)" -ne 0 ]]; then
+  echo >&2 "  [ERROR] This script requires privileged access to system files"
+  exit 4
+fi
+
+
+# === HELP ===
+if [[ "${ACTION_HELP}" -gt 0 ]]; then
+  show_usage
+  exit 0
+fi
+
+
+# === INIT ===
+if [[ "${ACTION_INIT}" -gt 0 ]]; then
+
+  # Nothing to do
+  echo "  [INFO] NOTHING TO DO. run the 'start' command."
+
+  # All done
+  echo "  [INFO] Configuration(s) successfully updated"
+fi
+
+
+# === START ===
+if [[ "${ACTION_START}" -gt 0 ]]; then
+
+  # Create temporary dir (if needed)
+  if ! [[ -d /tmp ]]; then
+    mkdir -m 1777 /tmp
+  fi
+
+  # What do we have to start...
+  if [[ "${START_NOTEBOOK}" -gt 0 ]]; then
+    # Start the Jupyter Notebook environment
+    jupyter notebook --allow-root --no-browser --ip=${JUPYTER_ADDRESS} --port=${JUPYTER_PORT} --notebook-dir=${__JUPYTER_WORDIR__}  --NotebookApp.token=${JUPYTER_TOKEN}
+  else
+    # Start the Jupyter Lab environment
+    jupyter lab --allow-root --no-browser --ip=${JUPYTER_ADDRESS} --port=${JUPYTER_PORT} --notebook-dir=${__JUPYTER_WORDIR__}  --NotebookApp.token=${JUPYTER_TOKEN}
+  fi
+fi
+
+# All done
+exit 0
