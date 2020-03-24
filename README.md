@@ -1,9 +1,5 @@
 # Jupyter for Docker
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/fscm/jupyter.svg?color=black&logo=docker&logoColor=white&style=flat-square)](https://hub.docker.com/r/fscm/jupyter)
-[![Docker Stars](https://img.shields.io/docker/stars/fscm/jupyter.svg?color=black&logo=docker&logoColor=white&style=flat-square)](https://hub.docker.com/r/fscm/jupyter)
-[![Docker Build Status](https://img.shields.io/docker/cloud/build/fscm/jupyter.svg?color=black&logo=docker&logoColor=white&style=flat-square)](https://hub.docker.com/r/fscm/jupyter)
-
 A small Jupyter image that can be used for either Jupyter Notebook or
 JupyterLab.
 
