@@ -5,7 +5,9 @@ JupyterLab.
 
 ## Supported tags
 
-- `4.6.0`, `latest`
+- `4.6.0` _(deprecated)_
+- `2.2.0-centos`, `centos`
+- `2.2.0-debian`, `2.2.0`, `debian`, `latest`
 
 ## What is Jupyter Notebook?
 
@@ -35,23 +37,26 @@ Docker installation instructions can be found
 
 ### Usage
 
-In order to end up with a functional Jupyter application - after having build
+In order to end up with a functional Jupyter notebook - after having build
 the container - some configurations have to be performed.
 
 To help perform those configurations a small set of commands is included on the
 Docker container.
 
 - `help` - Usage help.
-- `init` - Configure the Jupyter application (__Not required in this image__).
+- `init` - Configure the Jupyter service (__Not required in this image__).
 - `start` - Start the Jupyter service.
 
-To store the documents created in the Jupyter application a volume can be
+To store the documents created in the Jupyter notebook a volume should be
 created and added to the container when running the same.
 
 **Note:** A local folder can also be used instead of a volume. Use the path of
 the folder in place of the volume name.
 
 #### Creating Volumes
+
+To be able to make all of the MongoDB data persistent, the same will have to
+be stored on a different volume.
 
 Creating volumes can be done using the `docker` tool. To create a volume use
 the following command:
@@ -63,7 +68,7 @@ docker volume create --name VOLUME_NAME
 Two create the required volume the following command can be used:
 
 ```
-docker volume create --name my_jupyter
+docker volume create --name my_notebooks
 ```
 
 #### Configuring the Jupyter Application
@@ -77,7 +82,7 @@ After configuring the Jupyter application the same can now be started.
 Starting the Jupyter application can be done with the `start` command.
 
 ```
-docker run --volume JUPYTER_VOL:/work:rw --detach --interactive --tty -p 8888:8888 fscm/jupyter:latest [options] start
+docker container run --volume VOLUME_NAME:/work:rw --detach --publish 8888:8888/tcp fscm/jupyter:latest [options] start
 ```
 
 * `-l` - Starts the JypiterLab environment.
@@ -86,13 +91,13 @@ docker run --volume JUPYTER_VOL:/work:rw --detach --interactive --tty -p 8888:88
 An example on how the Jupyter application can be started:
 
 ```
-docker run --volume ~/my/jupyter/documents:/work:rw --detach --interactive --tty -p 8888:8888 --name my_jupyter fscm/jupyter:latest start
+docker container run --volume my_notebooks:/work:rw --detach --publish 8888:8888/tcp --name my_jupyter fscm/jupyter:latest start
 ```
 
 To see the output of the container that was started use the following command:
 
 ```
-docker attach CONTAINER_ID
+docker container attach CONTAINER_ID
 ```
 
 Use the `ctrl+p` `ctrl+q` command sequence to detach from the container.
@@ -120,19 +125,19 @@ shell from which the `pip install` command can be run.
 If needed the Jupyter application can be stoped and later started again (as
 long as the command used to perform the initial start was as indicated before).
 
-To stop the application use the following command:
+To stop the container use the following command:
 
 ```
-docker stop CONTAINER_ID
+docker container stop CONTAINER_ID
 ```
 
-To start the application again use the following command:
+To start the server again use the following command:
 
 ```
-docker start CONTAINER_ID
+docker container start CONTAINER_ID
 ```
 
-### Jupyter Application Status
+### Jupyter Status
 
 The Jupyter application status can be check by looking at the Jupyter
 application output data using the docker command:

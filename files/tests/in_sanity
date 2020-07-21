@@ -12,70 +12,130 @@
 #
 
 # Variables
+DEBCONF_NONINTERACTIVE_SEEN="true"
+DEBIAN_FRONTEND="noninteractive"
 
-echo "=== Docker Build Test ==="
 
-echo -n "[TEST] Check if Python is installed... "
-python --version &>/dev/null
-if [[ "$?" -eq "0" ]]; then
-  echo 'OK'
-else
-  echo 'Failed'
-  exit 1
+echo '=== Docker Build Test ==='
+
+# Create temporary dir (if needed)
+if ! [ -d /tmp ]; then
+  mkdir -m 1777 /tmp
 fi
 
-echo -n "[TEST] Check if PIP is installed... "
-pip --version &>/dev/null
-if [[ "$?" -eq "0" ]]; then
-  echo 'OK'
+# load platform info
+. /etc/os-release
+
+if [ "xdebian" = "x${ID}" ] ; then
+
+  printf '[TEST] Check if apt command is installed... '
+  if dpkg -s apt > /dev/null 2>&1; then
+    echo 'OK'
+  else
+    echo 'Failed'
+    exit 1
+  fi
+
+  printf '[TEST] Check package installation with apt... '
+  if (apt-get -qq update && apt-get -y -qq install less > /dev/null 2>&1 && less --version > /dev/null 2>&1); then
+    echo 'OK'
+  else
+    echo 'Failed'
+    exit 2
+  fi
+
+  printf '[TEST] Check if debootstrap dir was removed... '
+  if [ ! -e /debootstrap ]; then
+    echo 'OK'
+  else
+    echo 'Failed'
+    exit 3
+  fi
+
+elif [ "xcentos" = "x${ID}" ] ; then
+
+  printf '[TEST] Check if yum command is installed... '
+  if rpm -q yum > /dev/null 2>&1; then
+    echo 'OK'
+  else
+    echo 'Failed'
+    exit 1
+  fi
+
+  printf '[TEST] Check package installation with yum... '
+  if (yum -y -q install less && less --version) > /dev/null 2>&1; then
+    echo 'OK'
+  else
+    echo 'Failed'
+    exit 2
+  fi
+
 else
-  echo 'Failed'
-  exit 2
+  echo '[TEST] Platform test not performed. Unknown platform.'
 fi
 
-echo -n "[TEST] Check if PIP can install modules... "
-pip install --upgrade test-pip-install &>/dev/null
-if [[ "$?" -eq "0" ]]; then
-  echo 'OK'
-else
-  echo 'Failed'
-  exit 3
-fi
-
-echo -n "[TEST] Check if PIP installed binaries into 'PATH'... "
-test-pip-install &>/dev/null
-if [[ "$?" -eq "0" ]]; then
-  echo 'OK'
-else
-  echo 'Failed'
-  exit 4
-fi
-
-echo -n "[TEST] Check if Python can find installed modules... "
-python -m test_pip_install &>/dev/null
-if [[ "$?" -eq "0" ]]; then
+printf '[TEST] Check if Python is installed... '
+if (python3 --version && python --version) > /dev/null 2>&1; then
   echo 'OK'
 else
   echo 'Failed'
   exit 5
 fi
 
-echo -n "[TEST] Check if Jupyter is installed... "
-jupyter --version &>/dev/null
-if [[ "$?" -eq "0" ]]; then
+printf '[TEST] Check if PIP is installed... '
+if (pip3 --version && pip --version) > /dev/null 2>&1; then
   echo 'OK'
 else
   echo 'Failed'
   exit 6
 fi
 
-echo -n "[TEST] Check if JupyterLab is installed... "
-jupyter-lab --version &>/dev/null
-if [[ "$?" -eq "0" ]]; then
+printf '[TEST] Check if PIP can install modules... '
+if pip install --quiet --upgrade test-pip-install > /dev/null 2>&1; then
   echo 'OK'
 else
   echo 'Failed'
   exit 7
+fi
+
+printf '[TEST] Check if PIP installed binaries into path... '
+if test-pip-install > /dev/null 2>&1; then
+  echo 'OK'
+else
+  echo 'Failed'
+  exit 8
+fi
+
+printf '[TEST] Check if Python can find installed modules... '
+if python -m test_pip_install > /dev/null 2>&1; then
+  echo 'OK'
+else
+  echo 'Failed'
+  exit 9
+fi
+
+printf '[TEST] Check if Jupyter is installed... '
+if jupyter --version > /dev/null 2>&1; then
+  echo 'OK'
+else
+  echo 'Failed'
+  exit 10
+fi
+
+printf '[TEST] Check if JupyterLab is installed... '
+if jupyter-lab --version > /dev/null 2>&1; then
+  echo 'OK'
+else
+  echo 'Failed'
+  exit 11
+fi
+
+printf '[TEST] Check if Notebook is installed... '
+if jupyter-notebook --version > /dev/null 2>&1; then
+  echo 'OK'
+else
+  echo 'Failed'
+  exit 12
 fi
 
 exit 0
