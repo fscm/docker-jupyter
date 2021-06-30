@@ -20,12 +20,13 @@ BASENAME=$(basename "${0}")
 ACTION_HELP=0
 ACTION_INIT=0
 ACTION_START=0
+
 JUPYTER_ADDRESS="0.0.0.0"
 JUPYTER_PORT="8888"
 JUPYTER_TOKEN=""
 START_NOTEBOOK=1
 
-__DATA_DIR__="/work"
+__WORK_DIR__="${WORK_DIR:-/work}"
 
 
 # Usage
@@ -36,8 +37,8 @@ show_usage() {
   echo "  init:"
   echo "    <none>"
   echo "  start:"
-  echo "    -l  Starts the JypiterLab environment"
-  echo "    -n  Starts the Jupyter Notebook environment (default)"
+  echo "    -l  Starts the JypiterLab environment."
+  echo "    -n  Starts the Jupyter Notebook environment (default)."
 }
 
 
@@ -93,13 +94,6 @@ if [ "$((ACTION_HELP+ACTION_INIT+ACTION_START))" -eq 0 ]; then
 fi
 
 
-# Check permissions
-#if [[ "$(id -u)" -ne 0 ]]; then
-#  echo >&2 "  [ERROR] This script requires privileged access to system files"
-#  exit 4
-#fi
-
-
 # === HELP ===
 if [ "${ACTION_HELP}" -gt 0 ]; then
   show_usage
@@ -112,9 +106,6 @@ if [ "${ACTION_INIT}" -gt 0 ]; then
 
   # Nothing to do
   echo "  [INFO] NOTHING TO DO. run the 'start' command."
-
-  # All done
-  echo "  [INFO] Configuration(s) successfully updated"
 fi
 
 
@@ -129,10 +120,10 @@ if [ "${ACTION_START}" -gt 0 ]; then
   # What do we have to start...
   if [ "${START_NOTEBOOK}" -gt 0 ]; then
     # Start the Jupyter Notebook environment
-    jupyter notebook --allow-root --no-browser --ip="${JUPYTER_ADDRESS}" --port=${JUPYTER_PORT} --notebook-dir="${__DATA_DIR__}" --NotebookApp.token="${JUPYTER_TOKEN}"
+    jupyter notebook --allow-root --no-browser --ip="${JUPYTER_ADDRESS}" --port=${JUPYTER_PORT} --notebook-dir="${__WORK_DIR__}" --NotebookApp.token="${JUPYTER_TOKEN}"
   else
     # Start the Jupyter Lab environment
-    jupyter lab --allow-root --no-browser --ip="${JUPYTER_ADDRESS}" --port=${JUPYTER_PORT} --notebook-dir="${__DATA_DIR__}" --NotebookApp.token="${JUPYTER_TOKEN}"
+    jupyter lab --allow-root --no-browser --ip="${JUPYTER_ADDRESS}" --port=${JUPYTER_PORT} --notebook-dir="${__WORK_DIR__}" --NotebookApp.token="${JUPYTER_TOKEN}"
   fi
 fi
 
