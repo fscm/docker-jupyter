@@ -120,10 +120,23 @@ if [ "${ACTION_START}" -gt 0 ]; then
   # What do we have to start...
   if [ "${START_NOTEBOOK}" -gt 0 ]; then
     # Start the Jupyter Notebook environment
-    jupyter notebook --allow-root --no-browser --ip="${JUPYTER_ADDRESS}" --port=${JUPYTER_PORT} --notebook-dir="${__WORK_DIR__}" --NotebookApp.token="${JUPYTER_TOKEN}"
+    jupyter notebook \
+      --allow-root \
+      --no-browser \
+      --ip="${JUPYTER_ADDRESS}" \
+      --port=${JUPYTER_PORT} \
+      --notebook-dir="${__WORK_DIR__}" \
+      --NotebookApp.quit_button=False \
+      --NotebookApp.token="${JUPYTER_TOKEN}"
   else
     # Start the Jupyter Lab environment
-    jupyter lab --allow-root --no-browser --ip="${JUPYTER_ADDRESS}" --port=${JUPYTER_PORT} --notebook-dir="${__WORK_DIR__}" --NotebookApp.token="${JUPYTER_TOKEN}"
+    jupyter lab \
+      --allow-root \
+      --no-browser \
+      --ip="${JUPYTER_ADDRESS}" \
+      --port=${JUPYTER_PORT} \
+      --notebook-dir="${__WORK_DIR__}" \
+      --NotebookApp.token="${JUPYTER_TOKEN}"
   fi
 fi
 

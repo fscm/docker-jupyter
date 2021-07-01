@@ -54,16 +54,16 @@ if [ "xdebian" = "x${ID}" ] ; then
 
 elif [ "xcentos" = "x${ID}" ] ; then
 
-  printf '[TEST] Check if yum command is installed... '
-  if rpm -q yum > /dev/null 2>&1; then
+  printf '[TEST] Check if dnf command is installed... '
+  if rpm -q dnf > /dev/null 2>&1; then
     echo 'OK'
   else
     echo 'Failed'
     exit 1
   fi
 
-  printf '[TEST] Check package installation with yum... '
-  if (yum -y -q install less && less --version) > /dev/null 2>&1; then
+  printf '[TEST] Check package installation with dnf... '
+  if (dnf -y -q install less && less --version) > /dev/null 2>&1; then
     echo 'OK'
   else
     echo 'Failed'
